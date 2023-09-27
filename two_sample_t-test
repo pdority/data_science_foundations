@@ -1,0 +1,80 @@
+#Two sample t test
+
+#install.packages(c("tidyverse", "readxl", "GLMsData"))
+library(tidyverse)
+library(readxl)
+library(GLMsData)
+
+#data, blocks for Welch test
+
+data(blocks)
+view(blocks)
+
+#Question- did the children tend to stack more cubical blocks than cylindrical
+#exploratory plott
+
+ggplot(blocks, aes(Shape, Number)) +
+  geom_boxplot()
+
+#inital box plot shows visual difference between number of blocks, per shape, stacked
+
+#t test general
+t.test(Number ~ Shape, data = blocks)
+#H0 = mu1 - mu2 = 0
+#HA = mu1 - mu2 not equal to 0
+
+
+#interpreation of results- the p-value, 9.056 e -11, is below the significance level of .05.  We reject the null hypothesis and can conclude there is a significant difference between the groups.  Children in the study tended to stack more of one type of block.
+
+#change hypothesis to more cube blocks stacked, one sided
+#H0 = mu1 - mu2 = 0
+#HA = mu1 - mu2 < 0
+
+
+t.test(Number ~ Shape, data = blocks,
+       alternative = "greater")
+
+
+#interpretation of results - the p-value is beloiw a significance level of .05.  We reject the null hypothesis and can conclude that more cube blocks were stacked.
+
+#test hypothesis that 2 more cubical blocks are stacked
+#H0 = mu1 - mu2 = 0
+#HA = mu1 - mu2 < 2
+
+t.test(Number ~ Shape, data = blocks,
+       alternative = "greater",
+       mu = 2)
+
+#interpreation - the p-value is below .05, we reject the null hypothesis, There were at least 2 more cube blocks stacked than cylinder.
+
+#equal variance using simulated data 
+
+set.seed(1)
+Time_A <- rnorm(60, 5, .2)
+Time_B <- rnorm(40, 5.1, .2)
+
+Group <- c(rep("A", 60), rep("B", 40))
+Time <- c(Time_A, Time_B)
+Reactions <- tibble(Group, Time)
+
+#plot data
+
+ggplot(Reactions, aes(Group, Time)) +
+  geom_boxplot()
+
+#visually, group b responds slightly faster than group A, the spread of data is similar
+
+#t test, equal variance, pooled t-test
+
+
+
+t.test(Time ~ Group, data = Reactions,
+       var.equal = TRUE)
+
+#interpreation - the p-value is below .05, we reject the null hypothesis, there is significance difference between the groups
+
+# notes on t-tests
+#paired t- test = related sample set
+# equal variance = 1. sample set the same size or 2. sample set have the same variance
+#unequal variance = sasmple sets do not have the same variance
+# two types of pooled test-  when the variances of the two populations are equal (the pooled test) and the other one is used when the variances of the two populations are unequal (the unpooled test)
