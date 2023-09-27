@@ -78,3 +78,4 @@ t.test(Time ~ Group, data = Reactions,
 # equal variance = 1. sample set the same size or 2. sample set have the same variance
 #unequal variance = sasmple sets do not have the same variance
 # two types of pooled test-  when the variances of the two populations are equal (the pooled test) and the other one is used when the variances of the two populations are unequal (the unpooled test)
+#youtube tutorial - https://www.youtube.com/watch?v=5f7S1Jx6WyE
