@@ -1,0 +1,56 @@
+library(rJava)
+library(openNLP)
+library(NLP)
+library(magrittr)
+options(java.parameters = "-Xmx8000m")
+
+text <- paste(c("It’s almost impossible to think of Canada without images of the Great Lakes coming to mind, but one of the 6 fun facts is that there are more lakes in Canada than in all the other countries in the world combined?",
+             "In fact, because they’re so large, they are actually considered to be enclosed seas.",
+             "If you hate hills, Bolivia is the place for you. One of the fun facts about the world is that this country holds the title of being the flattest country on the planet.",
+             "It also holds other records such as having the longest salt flat."), 
+           collapse = " ")
+
+text <- as.String(text)
+
+word_ann <- Maxent_Word_Token_Annotator()
+sent_ann <- Maxent_Sent_Token_Annotator()
+pos_ann <- Maxent_POS_Tag_Annotator()
+
+pos_annotations <-annotate(text, list(sent_ann, word_ann, pos_ann))
+text_annotations <- annotate(text, list(sent_ann, word_ann))
+
+head(text_annotations)
+
+text_doc <- AnnotatedPlainTextDocument(text, text_annotations)
+
+person_ann <- Maxent_Entity_Annotator(kind= "person")
+location_ann <- Maxent_Entity_Annotator(kind= "location")
+organization_ann <- Maxent_Entity_Annotator(kind= "organization")
+date_ann <- Maxent_Entity_Annotator(kind= "date")
+
+pipeline <- list(sent_ann,
+                 word_ann,
+                 person_ann,
+                 location_ann,
+                 organization_ann,
+                 date_ann)
+
+text_annotations <- annotate(text, pipeline)
+text_doc <- AnnotatedPlainTextDocument(text, text_annotations)
+
+entities <- function(doc, kind) {
+  s <- doc$content
+  a <- annotation(doc)
+  if(hasArg(kind)) {
+    k <- sapply(a$features, `[[`, "kind")
+    s[a[k == kind]]
+  } else {
+    s[a[a$type == "entity"]]
+  }
+}
+
+
+entities(text_doc, kind ="person")
+entities(text_doc, kind ="location")
+entities(text_doc, kind ="organizaion")
+entities(text_doc, kind ="date")
