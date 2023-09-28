@@ -1,0 +1,46 @@
+#this project was an inital proof of concept and code for application within an larger project.  The results are filtered to NNP and NNPS.
+
+library(rJava)
+library(openNLP)
+library(NLP)
+library(magrittr)
+library(tidyverse)
+
+x <- paste(c("It’s almost impossible to think of Canada without images of the Great Lakes coming to mind, but one of the 6 fun facts is that there are more lakes in Canada than in all the other countries in the world combined?",
+           "In fact, because they’re so large, they are actually considered to be enclosed seas.",
+       "If you hate hills, Bolivia is the place for you. One of the fun facts about the world is that this country holds the title of being the flattest country on the planet.",
+           "It also holds other records such as having the longest salt flat."), 
+       collapse = " ")
+
+#openNLP must work with string
+x <-as.String(x)
+
+#extract sentence
+
+x_sent <- Maxent_Sent_Token_Annotator()
+a1 <- annotate(x, x_sent)
+a1
+x_word <- Maxent_Word_Token_Annotator()
+a2 <- annotate(x, x_word, a1)
+a2
+
+pos_tag <- Maxent_POS_Tag_Annotator()
+pos_tag
+a3 <- annotate(x, pos_tag, a2)
+a3
+
+a3w <- subset(a3, type =="word")
+tags <- sapply(a3w$features, '[[', "POS")
+table(tags)
+
+#NNP and NNPS proper nouns singular and 
+
+tag_word <- sprintf("%s/%s", x[a3w], tags)
+tag_word <- data.frame(tag_word)
+
+tag_word <- tag_word %>% separate(tag_word, c("word", "POS"), "/")
+
+tag_words <- tag_word |>
+    filter(POS == "NNP" | POS== "NNPS")
+    
+tag_words
